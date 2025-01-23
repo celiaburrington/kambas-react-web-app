@@ -209,7 +209,7 @@ export default function Lab1() {
           <label htmlFor="wd-radio-fantasy">Fantasy</label><br />
           {/** Note: grouping radio buttons with same name allows for exclusivity (i.e. only selecting one at a time) */}
           <input type="radio" name="radio-not-exclusive" id="wd-radio-example"/>
-          <label htmlFor="wd-radio-example">Example (selecting this button does not toggle the genre selected since it does not share a name)</label>
+          <label htmlFor="wd-radio-example">Selecting this button does not toggle the genre selected since it does not share a name</label>
 
           <h5 id="wd-checkboxes">Checkboxes</h5>
           <label>Favorite movie genre:</label><br/>
