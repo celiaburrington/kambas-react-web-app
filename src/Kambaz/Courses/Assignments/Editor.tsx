@@ -7,24 +7,26 @@ import {
   FormLabel,
   Row,
 } from "react-bootstrap";
+import { useParams } from "react-router";
+
+import { assignments } from "../../Database";
 
 export default function AssignmentEditor() {
+  const { aid } = useParams();
+  const assignment = assignments.find((assignment) => assignment._id === aid);
+
+  if (!assignment) {
+    return <div>Assigment not found.</div>;
+  }
+
   return (
     <div id="wd-assignments-editor">
       <FormGroup className="mb-3">
         <FormLabel>Assigment Name</FormLabel>
-        <FormControl type="text" value="A1"></FormControl>
+        <FormControl type="text" value={assignment.title}></FormControl>
       </FormGroup>
       <FormGroup className="mb-3" controlId="wd-textarea">
-        <FormControl
-          as="textarea"
-          rows={6}
-          value="The assignment is available online Submit a link to the landing page of your Web application running on Netlify. 
-The landing page should be the Kambaz application with a link to the Lab exercises.
-Lab 1 should be the landing page of the Lab exercises and should include the following:
-Your full name and section Links to each of the lab assignments Link to the Kambaz application 
-Links to all relevant source code repositories The Kambaz application should include a link to navigate back to the landing page."
-        />
+        <FormControl as="textarea" rows={6} value={assignment.description} />
       </FormGroup>
       <Form>
         <Form.Group as={Row} className="mb-3">
@@ -32,7 +34,7 @@ Links to all relevant source code repositories The Kambaz application should inc
             Points
           </Form.Label>
           <Col sm={10}>
-            <Form.Control type="text" value="100" />
+            <Form.Control type="text" value={assignment.points} />
           </Col>
         </Form.Group>
         <Form.Group as={Row} className="mb-3">
@@ -94,15 +96,23 @@ Links to all relevant source code repositories The Kambaz application should inc
               </Form.Group>
               <Form.Group className="mb-2">
                 <Form.Label>Due</Form.Label>
-                <Form.Control type="date" value="2024-05-13" />
+                <Form.Control
+                  type="date"
+                  value={new Date(assignment?.due).toISOString().split("T")[0]}
+                />
               </Form.Group>
               <Form.Group className="mb-2">
                 <Form.Label>Available from</Form.Label>
-                <Form.Control type="date" value="2024-05-06" />
+                <Form.Control
+                  type="date"
+                  value={
+                    new Date(assignment?.available).toISOString().split("T")[0]
+                  }
+                />
               </Form.Group>
               <Form.Group className="mb-2">
                 <Form.Label>Until</Form.Label>
-                <Form.Control type="date" value="2024-05-20" />
+                <Form.Control type="date" />
               </Form.Group>
             </Col>
           </Form.Group>
@@ -114,7 +124,12 @@ Links to all relevant source code repositories The Kambaz application should inc
       </Button>
       <Button variant="secondary" className="me-1 float-end">
         Cancel
-      </Button><br /><br /><br /><br /><br />
+      </Button>
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
     </div>
   );
 }
