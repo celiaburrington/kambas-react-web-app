@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Button } from "react-bootstrap";
 
 export default function ArrayStateVariable() {
   const [array, setArray] = useState([1, 2, 3, 4, 5]);
@@ -12,13 +13,19 @@ export default function ArrayStateVariable() {
   return (
     <div id="wd-array-state-variables">
       <h3>Array State Variable</h3>
-      <button onClick={addElement}>Add Element</button>
+      <Button className="btn-success gap-2 mb-2" onClick={addElement}>
+        Add Element
+      </Button>
       <ul>
         {array.map((item, index) => (
           <li key={index}>
-            {" "}
             {item}
-            <button onClick={() => deleteElement(index)}>Delete</button>
+            <Button
+              className="btn-danger m-2"
+              onClick={() => deleteElement(index)}
+            >
+              Delete
+            </Button>
           </li>
         ))}
       </ul>

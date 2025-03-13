@@ -4,16 +4,31 @@ import { BsGripVertical } from "react-icons/bs";
 import LessonControlButtons from "../Modules/LessonControlButtons";
 import AssignmentsControls from "./AssignmentsControls";
 import AssignmentControlButtons from "./AssignmentControlButtons";
-import EditAssignmentButtons from "./EditAssignmentButtons";
-import * as db from "../../Database";
 import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { FaRegEdit, FaTrash } from "react-icons/fa";
+import { deleteAssignment } from "./reducer";
+import { useState } from "react";
+import AssigmentDeleter from "./AssignmentDeleter";
 
 export default function Assignments() {
   const { cid } = useParams();
-  const assignments = db.assignments;
+  const { assignments } = useSelector((state: any) => state.assignmentReducer);
+  const dispatch = useDispatch();
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const isFaculty = currentUser.role === "FACULTY";
+  // for delete assignment dialog
+  const [show, setShow] = useState(false);
+  const [toDelete, setToDelete] = useState({ _id: "", title: "" });
+  const handleClose = () => setShow(false);
+  const handleShow = (assignment: any) => {
+    setToDelete(assignment);
+    setShow(true);
+  };
+
   return (
     <div id="wd-assignments">
-      <AssignmentsControls />
+      <AssignmentsControls cid={cid ? cid : ""} />
       <br />
       <br />
       <br />
@@ -29,87 +44,49 @@ export default function Assignments() {
               .filter((assignment: any) => assignment.course === cid)
               .map((assignment: any) => (
                 <ListGroup.Item className="wd-assignment p-3 ps-1">
-                  <EditAssignmentButtons />
-                  <div className="float-start ps-3">
+                  <BsGripVertical className="float-start me-2 fs-3" />
+                  {isFaculty && (
                     <a
                       href={`#/Kambaz/Courses/${cid}/Assignments/${assignment._id}`}
                       className="wd-assignment-link"
                     >
-                      {assignment.title}
+                      <FaRegEdit className="float-start text-success fs-4" />
                     </a>
+                  )}
+                  <div className="float-start ps-3">
+                    {assignment.title}
                     <br />
                     <div className="fs-6">
                       Multiple Modules | <b>Not available until</b>{" "}
-                      {new Date(assignment.available).toLocaleString()} |
+                      {new Date(assignment.available + ":").toLocaleDateString(
+                        "en-US"
+                      )}
+                      , 12:00 AM |
                       <br />
                       <b>Due </b>
-                      {new Date(assignment.due).toLocaleString()} |{" "}
-                      {assignment.points}
+                      {new Date(assignment.due + ":").toLocaleDateString(
+                        "en-US"
+                      )}
+                      , 11:59 PM | {assignment.points}
                       pts
                     </div>
                   </div>
                   <LessonControlButtons />
+                  <FaTrash
+                    className="float-end text-danger me-2 mt-1"
+                    onClick={() => handleShow(assignment)}
+                  />
                 </ListGroup.Item>
               ))}
           </ListGroup>
-          {/* <ListGroup className="wd-assignment rounded-0">
-            <ListGroup.Item className="wd-assignment p-3 ps-1">
-              <EditAssignmentButtons />
-              <div className="float-start ps-3">
-                <a
-                  href="#/Kambaz/Courses/1234/Assignments/123"
-                  className="wd-assignment-link"
-                >
-                  A1
-                </a>
-                <br />
-                <div className="fs-6">
-                  Multiple Modules | <b>Not available until</b> May 6th at
-                  12:00am |<br />
-                  <b>Due</b> May 13th at 11:59pm | 100 pts
-                </div>
-              </div>
-              <LessonControlButtons />
-            </ListGroup.Item>
-            <ListGroup.Item className="wd-assignment p-3 ps-1">
-              <EditAssignmentButtons />
-              <div className="float-start ps-3">
-                <a
-                  href="#/Kambaz/Courses/1234/Assignments/123"
-                  className="wd-assignment-link"
-                >
-                  A2
-                </a>
-                <br />
-                <div className="fs-6">
-                  Multiple Modules | <b>Not available until</b> May 13th at
-                  12:00am |<br />
-                  <b>Due</b> May 20th at 11:59pm | 100 pts
-                </div>
-              </div>
-              <LessonControlButtons />
-            </ListGroup.Item>
-            <ListGroup.Item className="wd-assignment p-3 ps-1">
-              <EditAssignmentButtons />
-              <div className="float-start ps-3">
-                <a
-                  href="#/Kambaz/Courses/1234/Assignments/123"
-                  className="wd-assignment-link"
-                >
-                  A2
-                </a>
-                <br />
-                <div className="fs-6">
-                  Multiple Modules | <b>Not available until</b> May 20th at
-                  12:00am |<br />
-                  <b>Due</b> May 27th at 11:59pm | 100 pts
-                </div>
-              </div>
-              <LessonControlButtons />
-            </ListGroup.Item>
-          </ListGroup> */}
         </ListGroup.Item>
       </ListGroup>
+      <AssigmentDeleter
+        show={show}
+        handleClose={handleClose}
+        dialogTitle={`Are you sure you want to remove ${toDelete.title}?`}
+        deleteAssignment={() => dispatch(deleteAssignment(toDelete._id))}
+      />
     </div>
   );
 }
