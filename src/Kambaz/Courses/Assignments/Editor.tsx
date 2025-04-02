@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Button,
   Col,
@@ -8,25 +9,47 @@ import {
   Row,
 } from "react-bootstrap";
 import { useParams } from "react-router";
-
-import { assignments } from "../../Database";
+import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
+import { addAssignment, updateAssignment } from "./reducer";
 
 export default function AssignmentEditor() {
-  const { aid } = useParams();
-  const assignment = assignments.find((assignment) => assignment._id === aid);
-
-  if (!assignment) {
-    return <div>Assigment not found.</div>;
-  }
+  const { cid, aid } = useParams();
+  // const navigate = useNavigate();
+  const { assignments } = useSelector((state: any) => state.assignmentReducer);
+  const dispatch = useDispatch();
+  const [assignment, setAssignment] = useState(
+    assignments.find((assignment: any) => assignment._id === aid) || {
+      _id: aid,
+      name: "",
+      course: cid,
+      points: 0,
+      description: "",
+      new: true,
+    }
+  );
 
   return (
-    <div id="wd-assignments-editor">
+    <div id="wd-assignments-editor" className="m-2">
       <FormGroup className="mb-3">
         <FormLabel>Assigment Name</FormLabel>
-        <FormControl type="text" value={assignment.title}></FormControl>
+        <FormControl
+          type="text"
+          value={assignment.title}
+          onChange={(e) =>
+            setAssignment({ ...assignment, title: e.target.value })
+          }
+        />
       </FormGroup>
       <FormGroup className="mb-3" controlId="wd-textarea">
-        <FormControl as="textarea" rows={6} value={assignment.description} />
+        <FormControl
+          as="textarea"
+          rows={6}
+          value={assignment.description}
+          onChange={(e) =>
+            setAssignment({ ...assignment, description: e.target.value })
+          }
+        />
       </FormGroup>
       <Form>
         <Form.Group as={Row} className="mb-3">
@@ -34,7 +57,17 @@ export default function AssignmentEditor() {
             Points
           </Form.Label>
           <Col sm={10}>
-            <Form.Control type="text" value={assignment.points} />
+            <Form.Control
+              type="text"
+              defaultValue={0}
+              value={assignment.points}
+              onChange={(e) =>
+                setAssignment({
+                  ...assignment,
+                  points: e.target.value ? parseInt(e.target.value) : 0,
+                })
+              }
+            />
           </Col>
         </Form.Group>
         <Form.Group as={Row} className="mb-3">
@@ -95,36 +128,73 @@ export default function AssignmentEditor() {
                 <Form.Control type="text" value="Everyone" />
               </Form.Group>
               <Form.Group className="mb-2">
-                <Form.Label>Due</Form.Label>
-                <Form.Control
-                  type="date"
-                  value={new Date(assignment?.due).toISOString().split("T")[0]}
-                />
-              </Form.Group>
-              <Form.Group className="mb-2">
                 <Form.Label>Available from</Form.Label>
                 <Form.Control
                   type="date"
-                  value={
-                    new Date(assignment?.available).toISOString().split("T")[0]
-                  }
+                  value={assignment.available}
+                  onChange={(e) => {
+                    setAssignment({
+                      ...assignment,
+                      available: new Date(e.target.value)
+                        .toISOString()
+                        .split("T")[0],
+                    });
+                  }}
+                />
+              </Form.Group>
+              <Form.Group className="mb-2">
+                <Form.Label>Due</Form.Label>
+                <Form.Control
+                  type="date"
+                  value={assignment.due}
+                  onChange={(e) => {
+                    setAssignment({
+                      ...assignment,
+                      due: new Date(e.target.value).toISOString().split("T")[0],
+                    });
+                  }}
                 />
               </Form.Group>
               <Form.Group className="mb-2">
                 <Form.Label>Until</Form.Label>
-                <Form.Control type="date" />
+                <Form.Control
+                  type="date"
+                  value={assignment.until}
+                  onChange={(e) => {
+                    setAssignment({
+                      ...assignment,
+                      until: new Date(e.target.value)
+                        .toISOString()
+                        .split("T")[0],
+                    });
+                  }}
+                />
               </Form.Group>
             </Col>
           </Form.Group>
         </fieldset>
       </Form>
       <hr />
-      <Button variant="danger" className="me-1 float-end">
-        Save
-      </Button>
-      <Button variant="secondary" className="me-1 float-end">
-        Cancel
-      </Button>
+      <a href={`#/Kambaz/Courses/${cid}/Assignments`}>
+        <Button
+          variant="danger"
+          className="me-1 float-end"
+          onClick={() => {
+            if (assignment.new) {
+              dispatch(addAssignment(assignment));
+            } else {
+              dispatch(updateAssignment(assignment));
+            }
+          }}
+        >
+          Save
+        </Button>
+      </a>
+      <a href={`#/Kambaz/Courses/${cid}/Assignments`}>
+        <Button variant="secondary" className="me-1 float-end">
+          Cancel
+        </Button>
+      </a>
       <br />
       <br />
       <br />

@@ -1,3 +1,4 @@
+import { Container } from "react-bootstrap";
 import Add from "./Add";
 import AddingAndRemovingToFromArrays from "./AddingAndRemovingToFromArrays";
 import ArrayIndexAndLength from "./ArrayIndexAndLength";
@@ -29,12 +30,17 @@ import TemplateLiterals from "./TemplateLiterals";
 import TernaryOperator from "./TernaryOperator";
 import TodoList from "./todos/TodoList";
 import VariablesAndConstants from "./VariablesAndConstants";
+import TodoListRedux from "./todos/TodoListRedux";
 
 export default function Lab3() {
   console.log("Hello, World!");
   return (
-    <div>
+    <Container id="wd-lab3">
       <h2>Lab 3</h2>
+      <div className="small">
+        * added boostrap container wrapper since the borders were bugging me
+      </div>
+      <TodoListRedux />
       <VariablesAndConstants />
       <BooleanVariables />
       <IfElse />
@@ -74,6 +80,6 @@ export default function Lab3() {
       </Highlight>
       <PathParameters />
       <hr />
-    </div>
+    </Container>
   );
 }
