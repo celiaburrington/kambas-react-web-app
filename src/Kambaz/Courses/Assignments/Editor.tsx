@@ -12,6 +12,8 @@ import { useParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { addAssignment, updateAssignment } from "./reducer";
+import * as coursesClient from "../client";
+import * as assignmentsClient from "./client";
 
 export default function AssignmentEditor() {
   const { cid, aid } = useParams();
@@ -28,6 +30,20 @@ export default function AssignmentEditor() {
       new: true,
     }
   );
+
+  const createAssignmentForCourse = async () => {
+    if (!cid) return;
+    const newAssignment = await coursesClient.createAssignmentForCourse(
+      cid,
+      assignment
+    );
+    dispatch(addAssignment(newAssignment));
+  };
+
+  const modifyAssignment = async () => {
+    await assignmentsClient.updateAssignment(assignment);
+    dispatch(updateAssignment(assignment));
+  };
 
   return (
     <div id="wd-assignments-editor" className="m-2">
@@ -181,9 +197,9 @@ export default function AssignmentEditor() {
           className="me-1 float-end"
           onClick={() => {
             if (assignment.new) {
-              dispatch(addAssignment(assignment));
+              createAssignmentForCourse();
             } else {
-              dispatch(updateAssignment(assignment));
+              modifyAssignment();
             }
           }}
         >
