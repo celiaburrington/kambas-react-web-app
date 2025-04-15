@@ -57,8 +57,8 @@ export default function Assignments() {
             <AssignmentControlButtons />
           </div>
           <ListGroup className="wd-assignment rounded-0">
-            {assignments.map((assignment: any) => (
-              <ListGroup.Item className="wd-assignment p-3 ps-1">
+            {assignments.map((assignment: any, idx: number) => (
+              <ListGroup.Item className="wd-assignment p-3 ps-1" key={idx}>
                 <BsGripVertical className="float-start me-2 fs-3" />
                 {isFaculty && (
                   <a
@@ -85,10 +85,12 @@ export default function Assignments() {
                   </div>
                 </div>
                 <LessonControlButtons />
-                <FaTrash
-                  className="float-end text-danger me-2 mt-1"
-                  onClick={() => handleShow(assignment)}
-                />
+                {isFaculty && (
+                  <FaTrash
+                    className="float-end text-danger me-2 mt-1"
+                    onClick={() => handleShow(assignment)}
+                  />
+                )}
               </ListGroup.Item>
             ))}
           </ListGroup>

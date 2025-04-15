@@ -5,9 +5,11 @@ const axiosWithCredentials = axios.create({ withCredentials: true });
 export const REMOTE_SERVER = import.meta.env.VITE_REMOTE_SERVER;
 export const USERS_API = `${REMOTE_SERVER}/api/users`;
 
-export const findMyCourses = async (userId: string) => {
-  const { data } = await axios.get(`${USERS_API}/${userId}/courses`);
-  return data;
+export const findCoursesForUser = async (userId: string) => {
+  const response = await axiosWithCredentials.get(
+    `${USERS_API}/${userId}/courses`
+  );
+  return response.data;
 };
 
 export const signin = async (credentials: any) => {
@@ -31,14 +33,6 @@ export const profile = async () => {
 export const signout = async () => {
   const response = await axiosWithCredentials.post(`${USERS_API}/signout`);
   return response.data;
-};
-
-export const createCourse = async (course: any) => {
-  const { data } = await axiosWithCredentials.post(
-    `${USERS_API}/current/courses`,
-    course
-  );
-  return data;
 };
 
 export const findAllUsers = async () => {
@@ -76,5 +70,18 @@ export const updateUser = async (user: any) => {
 
 export const createUser = async (user: any) => {
   const response = await axios.post(`${USERS_API}`, user);
+  return response.data;
+};
+
+export const enrollIntoCourse = async (userId: string, courseId: string) => {
+  const response = await axiosWithCredentials.post(
+    `${USERS_API}/${userId}/courses/${courseId}`
+  );
+  return response.data;
+};
+export const unenrollFromCourse = async (userId: string, courseId: string) => {
+  const response = await axiosWithCredentials.delete(
+    `${USERS_API}/${userId}/courses/${courseId}`
+  );
   return response.data;
 };

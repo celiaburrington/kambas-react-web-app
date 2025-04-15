@@ -7,12 +7,24 @@ import AssignmentEditor from "./Assignments/Editor";
 import { FaAlignJustify } from "react-icons/fa";
 import PeopleTable from "./People/Table";
 import ProtectedRoute from "./Assignments/ProtectedRoute";
+import * as courseClient from "./client";
+import { useEffect, useState } from "react";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Courses({ courses }: { courses: any[] }) {
   const { cid } = useParams();
   const { pathname } = useLocation();
   const course = courses.find((course) => course._id === cid);
+  const [users, setUsers] = useState([]);
+
+  const fetchModulesForCourse = async () => {
+    const users = await courseClient.findUsersForCourse(cid || "");
+    setUsers(users);
+  };
+  useEffect(() => {
+    fetchModulesForCourse();
+  }, [cid]);
+
   return (
     <div id="wd-courses">
       <h2 className="text-danger">
@@ -37,7 +49,7 @@ export default function Courses({ courses }: { courses: any[] }) {
                 </ProtectedRoute>
               }
             />
-            <Route path="People" element={<PeopleTable />} />
+            <Route path="People" element={<PeopleTable users={users} />} />
           </Routes>
         </div>
       </div>
