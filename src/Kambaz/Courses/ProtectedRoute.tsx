@@ -10,8 +10,9 @@ export default function ProtectedCourseRoute({ children }: { children: any }) {
     (enrollment: any) =>
       enrollment.user === currentUser._id && enrollment.course === cid
   );
+  const isAdmin = currentUser && currentUser.role === "ADMIN";
 
-  if (isEnrolled && currentUser) {
+  if ((currentUser && isEnrolled) || isAdmin) {
     return children;
   } else if (!currentUser) {
     return <Navigate to="/Kambaz/Account/Signin" />;

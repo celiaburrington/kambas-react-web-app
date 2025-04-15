@@ -20,8 +20,9 @@ export default function CourseNavigation() {
       id="wd-courses-navigation"
       className="wd list-group fs-5 rounded-0"
     >
-      {links.map((link) => (
+      {links.map((link, idx) => (
         <ListGroup.Item
+          key={idx}
           as={Link}
           to={`/Kambaz/Courses/${cid}/${link}`}
           className={`list-group-item border border-0 ${

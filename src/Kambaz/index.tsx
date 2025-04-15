@@ -6,31 +6,64 @@ import KambazNavigation from "./Navigation";
 import Courses from "./Courses";
 import "./styles.css";
 import ProtectedRoute from "./Account/ProtectedRoute";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ProtectedCourseRoute from "./Courses/ProtectedRoute";
 import Session from "./Account/Session";
 import { useEffect, useState } from "react";
-import * as userClient from "./Account/client";
 import * as courseClient from "./Courses/client";
+import * as userClient from "./Account/client";
+import { setEnrollments } from "./Dashboard/reducer";
 
 export default function Kambaz() {
   const [courses, setCourses] = useState<any[]>([]);
-  const [myCourses, setMyCourses] = useState<any[]>([]);
   const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const [enrolling, setEnrolling] = useState(false);
+  const dispatch = useDispatch();
+  const findCoursesForUser = async () => {
+    try {
+      const courses = await userClient.findCoursesForUser(currentUser._id);
+      setCourses(courses);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const fetchCourses = async () => {
     try {
-      const courses = await courseClient.fetchAllCourses();
-      const myCourses = await userClient.findMyCourses(currentUser._id);
+      const allCourses = await courseClient.fetchAllCourses();
+      const enrolledCourses = await userClient.findCoursesForUser(
+        currentUser._id
+      );
+      const courses = allCourses.map((course: any) => {
+        if (enrolledCourses.find((c: any) => c._id === course._id)) {
+          return { ...course, enrolled: true };
+        } else {
+          return course;
+        }
+      });
       setCourses(courses);
-      setMyCourses(myCourses);
     } catch (error) {
       console.error(error);
     }
   };
 
+  async function fetchEnrollements() {
+    const enrollments = await userClient.findAllEnrollments(currentUser._id);
+    dispatch(setEnrollments(enrollments));
+  }
+
   useEffect(() => {
-    fetchCourses();
+    fetchEnrollements();
   }, [currentUser]);
+
+  useEffect(() => {
+    if (enrolling) {
+      fetchCourses();
+    } else {
+      findCoursesForUser();
+    }
+  }, [currentUser, enrolling]);
+
+  console.log(courses);
 
   return (
     <Session>
@@ -46,9 +79,9 @@ export default function Kambaz() {
                 <ProtectedRoute>
                   <Dashboard
                     courses={courses}
-                    myCourses={myCourses}
                     setCourses={setCourses}
-                    setMyCourses={setMyCourses}
+                    enrolling={enrolling}
+                    setEnrolling={setEnrolling}
                   />
                 </ProtectedRoute>
               }
