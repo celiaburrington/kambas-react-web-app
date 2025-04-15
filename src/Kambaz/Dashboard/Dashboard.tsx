@@ -36,6 +36,7 @@ export default function Dashboard({
   const addNewCourse = async () => {
     const newCourse = await courseClient.createCourse(course);
     setCourses([...courses, newCourse]);
+    dispatch(addEnrollment({ user: currentUser._id, course: newCourse._id }));
   };
 
   const deleteCourse = async (courseId: string) => {
