@@ -6,17 +6,19 @@ import KambazNavigation from "./Navigation";
 import Courses from "./Courses";
 import "./styles.css";
 import ProtectedRoute from "./Account/ProtectedRoute";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ProtectedCourseRoute from "./Courses/ProtectedRoute";
 import Session from "./Account/Session";
 import { useEffect, useState } from "react";
 import * as courseClient from "./Courses/client";
 import * as userClient from "./Account/client";
+import { setEnrollments } from "./Dashboard/reducer";
 
 export default function Kambaz() {
   const [courses, setCourses] = useState<any[]>([]);
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const [enrolling, setEnrolling] = useState(false);
+  const dispatch = useDispatch();
   const findCoursesForUser = async () => {
     try {
       const courses = await userClient.findCoursesForUser(currentUser._id);
@@ -44,6 +46,15 @@ export default function Kambaz() {
     }
   };
 
+  async function fetchEnrollements() {
+    const enrollments = await userClient.findAllEnrollments(currentUser._id);
+    dispatch(setEnrollments(enrollments));
+  }
+
+  useEffect(() => {
+    fetchEnrollements();
+  }, [currentUser]);
+
   useEffect(() => {
     if (enrolling) {
       fetchCourses();
@@ -51,6 +62,8 @@ export default function Kambaz() {
       findCoursesForUser();
     }
   }, [currentUser, enrolling]);
+
+  console.log(courses);
 
   return (
     <Session>

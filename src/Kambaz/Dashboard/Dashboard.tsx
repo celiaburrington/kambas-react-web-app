@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Row, Col, Card, Button } from "react-bootstrap";
 import { Link } from "react-router";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import NewCourse from "./NewCourse";
 import EditCourseButtons from "./EditCourseButtons";
 import { useState } from "react";
 import * as courseClient from "../Courses/client";
 import * as userClient from "../Account/client";
+import { addEnrollment, deleteEnrollment } from "./reducer";
 
 export default function Dashboard({
   courses,
@@ -30,6 +31,7 @@ export default function Dashboard({
   });
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const isFaculty = currentUser.role === "FACULTY";
+  const dispatch = useDispatch();
 
   const addNewCourse = async () => {
     const newCourse = await courseClient.createCourse(course);
@@ -57,8 +59,10 @@ export default function Dashboard({
   const updateEnrollment = async (courseId: string, enrolled: boolean) => {
     if (enrolled) {
       await userClient.enrollIntoCourse(currentUser._id, courseId);
+      dispatch(addEnrollment({ user: currentUser._id, course: courseId }));
     } else {
       await userClient.unenrollFromCourse(currentUser._id, courseId);
+      dispatch(deleteEnrollment({ user: currentUser._id, course: courseId }));
     }
     setCourses(
       courses.map((course) => {
